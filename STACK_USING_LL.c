@@ -13,9 +13,10 @@ node* create_node(int element){
     return ptr;
 }
 
-void display_stack(node **tailptr){
+//THIS FUNCTION IS JUST FOR REFERENCE IT DOESNOT OBEY THE RULES OF STACK
+void display_stack(node **top){
     node *ptr;
-    ptr=(*tailptr);
+    ptr=(*top);
     printf("\n");
     if(ptr){
         while(ptr){
@@ -27,61 +28,94 @@ void display_stack(node **tailptr){
         printf("UNDERFLOW\n");
     }
 }
-int pop(node **tailptr){
-    if((*tailptr)==NULL){
+int pop(node **top){
+    if((*top)==NULL){
         printf("\nUNDRFLOW");
 
         return 0;
     }
-    int del_element=(*tailptr)->data;
-    *tailptr=(*tailptr)->link;
+    int del_element=(*top)->data;
+    node *temp=(*top);
+    *top=(*top)->link;
+    free(temp);
     return (del_element);
 
 }
-node* push(node **tailptr,int element){
+void push(node **top,int element){
     node *ptr=create_node(element);
-    ptr->link=(*tailptr);
-    *tailptr=ptr;
-    return ptr;
+    ptr->link=(*top);
+    *top=ptr;
+    //return ptr;
 }
-node* peek(node **tailptr){
-    return (*tailptr);
-}
-
-int peek_at_desired_pos(node **tailptr,int top,int loc){
-        node *ttail=NULL;
-        node **ttailptr=&ttail;
-        int ttop=-1,element,i;
-        for(i=top;i>top-loc;i--){
-            push(ttailptr,(*(tailptr))->data);
-            ttop++;
-            pop(tailptr);
-        }
-        //display_stack(ttailptr);
-        element=(*(tailptr))->data;
-        for(i=ttop;i>=0;i--){
-            push(tailptr,(*(ttailptr))->data);
-            pop(ttailptr);
-        }
-        return element;
+int peek(node **top){
+    return ((*top)->data);
 }
 
-void update_at_desired_pos(node **tailptr,int top,int loc){
+int peek_at_desired_pos(node **top,int loc){
         node *ttail=NULL;
-        node **ttailptr=&ttail;
-        int ttop=-1,element,i;
-        for(i=top;i>top-loc;i--){
-            push(ttailptr,(*(tailptr))->data);
-            ttop++;
-            pop(tailptr);
+        node **ttop=&ttail;
+        int value,element,i;
+        for(i=loc;i>=1;i--){
+            element=pop(top);
+            push(ttop,element);
+            //ttop++;
         }
-        //display_stack(ttailptr);
-        printf("\nENTER THE UPDATED VALUE: ");
-        scanf("%d",&element);
-        (*(tailptr))->data=element;
-        for(i=ttop;i>=0;i--){
-            push(tailptr,(*(ttailptr))->data);
-            pop(ttailptr);
+        //display_stack(ttop);
+        value=peek(top);
+        for(i=loc;i>=1;i--){
+            element=pop(ttop);
+            push(top,element);
+        }
+        return value;
+}
+
+void peek_desired(node **top,int element){
+        node *ttail=NULL;
+        node **ttop=&ttail;
+        int value,i=0,flag=0;
+        while(*top){
+            value=pop(top);
+            if(value==element){
+                printf("ELEMENT FOUND AT %d FROM TOP OF STACK",i+1);
+                flag=1;
+                break;
+            }
+            push(ttop,value);
+            i++;
+        }
+        while(*ttop){
+            value=pop(ttop);
+            push(top,value);
+        }
+        if(flag!=1){
+            printf("\nELEMENT NOT FOUND!!\n");
+
+        }
+}
+
+void update_desired_pos(node **top,int element){
+        node *ttail=NULL;
+        node **ttop=&ttail;
+        int value,i=0,flag=0;
+        while(*top){
+            value=pop(top);
+            if(value==element){
+                printf("\nENTER THE UPDATED VALUE: ");
+                scanf("%d",&element);
+                (*(top))->data=element;
+                flag=1;
+                break;
+            }
+            push(ttop,value);
+            i++;
+        }
+        while(*ttop){
+            value=pop(ttop);
+            push(top,value);
+        }
+        if(flag!=1){
+            printf("\nELEMENT NOT FOUND!!\n");
+
         }
 }
 
@@ -89,42 +123,50 @@ void update_at_desired_pos(node **tailptr,int top,int loc){
 
 void main(){
     node *tail=NULL;
-    node **tailptr=&tail;
-    int top=-1,element,loc,option;
+    node **top=&tail;
+    int element,loc,option;
     while(1){
-      printf("\n1.PUSH \t2.POP \t3.PEEK \t4.PEEK AT DESIRED LOCATION\n5.DISPLAY  \t6.UPDATION \t7.EXIT\n");
+      printf("\n1.PUSH \t2.POP \t3.PEEK \t4.PEEK AT DESIRED LOCATION\n5.DISPLAY  \t6.UPDATION \t7.PEEK DESIRED ELEMENT \t8.EXIT\n");
       printf("ENTER YOUR OPTION: ");
       scanf("%d",&option);
       switch(option){
         case 1:
             printf("\nENTER THE NUMBER TO BE PUSHED INTO THE STACK: ");
             scanf("%d",&element);
-            printf("\n%d HAS BEEN PUSHED INTO THE STACK",(push(tailptr,element)->data));
-            top++;
+            push(top,element);
+            //printf("\n%d HAS BEEN PUSHED INTO THE STACK",(push(top,element)->data));
+            //top++;
             break;
         case 2:
-            printf("\nELEMENT DELETED IS %d",pop(tailptr));
-            display_stack(tailptr);
+            printf("\nELEMENT DELETED IS %d",pop(top));
+            display_stack(top);
             break;
          case 3:
-            printf("\nTHE LAST ELEMENT IN THE STACK IS: %d",(peek(tailptr))->data);
+            printf("\nTHE LAST ELEMENT IN THE STACK IS: %d",(peek(top)));
             break;
          case 4:
             printf("\nENTER THE LOC YOU WANT TO SEARCH: ");
             scanf("%d",&loc);
             loc=loc-1;
-            element=peek_at_desired_pos(tailptr,top,loc);
+            element=peek_at_desired_pos(top,loc);
             printf("\nTHE LAST ELEMENT IN THE STACK IS: %d",element);
             break;
          case 5:
-            display_stack(tailptr);
+            display_stack(top);
             break;
          case 6:
-            printf("\nENTER THE LOC YOU WANT TO UPDATE: ");
-            scanf("%d",&loc);
-            loc=loc-1;
-            update_at_desired_pos(tailptr,top,loc);
+            printf("\nENTER THE ELEMENT YOU WANT TO UPDATE: ");
+            scanf("%d",&element);
+            update_desired_pos(top,element);
             printf("\nSTACK IS UPDATED!!");
+            break;
+         case 7:
+            printf("ENTER THE ELEMENT TO BE SEARCHED: ");
+            scanf("%d",&element);
+            peek_desired(top,element);
+            break;
+         case 8:
+            exit(4);
       }
    }
 
