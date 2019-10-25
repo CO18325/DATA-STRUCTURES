@@ -1,0 +1,94 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct NODE{
+    long data;
+    struct NODE *link;
+};
+typedef struct NODE node;
+
+node* create_node(long element){
+    node *ptr=(node*)malloc(sizeof(node));
+    ptr->data=element;
+    ptr->link=NULL;
+    return ptr;
+}
+
+
+long pop(node **top){
+    if((*top)==NULL){
+        printf("\nUNDRFLOW");
+
+        return 0;
+    }
+    long del_element=(*top)->data;
+    node *temp=(*top);
+    *top=(*top)->link;
+    free(temp);
+    return (del_element);
+
+}
+void push(node **top,long element){
+    node *ptr=create_node(element);
+    ptr->link=(*top);
+    *top=ptr;
+    //return ptr;
+}
+
+long peek(node **top){
+    return ((*top)->data);
+}
+
+
+long deQueue(node **top, node **ttop){
+        long value,element,i;
+        if(*ttop==NULL){
+            while(*top){
+                element=pop(top);
+                push(ttop,element);
+                //ttop++;
+            }    
+        }
+        value=pop(ttop);
+        return value;
+}
+long topData(node **top, node **ttop){
+        long value,element;
+        if(*ttop==NULL){
+            while(*top){
+                element=pop(top);
+                push(ttop,element);
+                //ttop++;
+            }
+        }
+        value=peek(ttop);    
+        return value;
+}
+
+
+
+int main(){
+    node *tail=NULL;
+    node **top=&tail;
+    node *ttail=NULL;
+    node **ttop=&ttail;    
+    long element,num_of_queries,opt;
+    scanf("%ld",&num_of_queries);
+    while(num_of_queries!=0){
+        scanf("%ld",&opt);
+        switch(opt){
+            case 1:
+                scanf("%ld",&element);
+                push(top,element);
+                break;
+            case 2:
+                deQueue(top,ttop);
+                break;
+            case 3:
+                printf("%ld\n",topData(top,ttop));
+                break;        
+        }
+        num_of_queries--;
+    }
+    
+    return 0;
+}
